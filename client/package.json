@@ -1,0 +1,16 @@
+{
+  "name": "fit-core",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "web": "npm run dev --workspace=apps/web",
+    "mobile": "npm run mobile:start --workspace=apps/mobile"
+  },
+  "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "react-router-dom": "^7.13.2"
+  }
+}

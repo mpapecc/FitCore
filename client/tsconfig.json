@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "extends": "expo/tsconfig.base",
+  "exclude": [
+    "node_modules",
+    "**/node_modules",
+    "apps/web/node_modules",
+    "apps/mobile/node_modules",
+    "packages/shared/node_modules"
+  ]
+}

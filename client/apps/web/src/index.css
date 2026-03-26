@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import "tailwindcss";
+
+/*
+ * Kinetic Forge Design Tokens — Tailwind v4 Theme
+ *
+ * Tailwind v4 uses CSS-first configuration via @theme (no tailwind.config.js).
+ * All tokens defined here generate semantic utility classes automatically:
+ *   --color-navy   → bg-navy, text-navy, border-navy
+ *   --color-green  → bg-green, text-green, border-green
+ *   --color-ghost  → bg-ghost
+ *   --color-stroke → border-stroke
+ *   --color-primary   → text-primary
+ *   --color-secondary → text-secondary
+ *   --color-success, --color-warning, --color-error → bg-*, text-*
+ *   --font-sans    → font-sans
+ *   --radius-*     → rounded-sm, rounded-md, rounded-lg
+ *   --duration-DEFAULT → duration-DEFAULT
+ *
+ * To change a color globally, update the value here — the entire UI updates.
+ */
+@theme {
+  /* ── Core Palette ─────────────────────────────────────────────── */
+  --color-navy: #0f172a; /* Midnight Navy  — sidebar, dark backgrounds  */
+  --color-green: #22c55e; /* Electric Green — buttons, accents, success   */
+  --color-green-hover: #16a34a; /* Green hover state                            */
+  --color-ghost: #f7f9fb; /* Ghost Gray     — secondary backgrounds       */
+  --color-stroke: #e2e8f0; /* Slate Stroke   — borders, dividers           */
+
+  /* ── Text ────────────────────────────────────────────────────── */
+  --color-primary: #1e293b; /* Deep Slate     — headings, body copy         */
+  --color-secondary: #64748b; /* Muted Slate    — subtext, labels             */
+
+  /* ── Status Colors ───────────────────────────────────────────── */
+  --color-success: #22c55e; /* Paid / positive trends                       */
+  --color-warning: #f59e0b; /* Pending / warnings                           */
+  --color-error: #ef4444; /* Overdue / errors / destructive               */
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --font-sans: "Inter", sans-serif;
+
+  /* ── Border Radius ───────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── Transitions ─────────────────────────────────────────────── */
+  --duration-DEFAULT: 200ms;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Sidebar nav scrollbar — thin, navy-themed */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-700 */
+  border-radius: 9999px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* slate-600 */
+}
