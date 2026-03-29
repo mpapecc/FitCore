@@ -1,4 +1,5 @@
-﻿using FitCore.Api.Application.Features.Members.Queries;
+﻿using FitCore.Api.Application.Features.Members.Commands;
+using FitCore.Api.Application.Features.Members.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,13 @@ namespace FitCore.Api.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetMembersQuery(Guid.NewGuid()));
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMember(CreateMemberCommand createMember, CancellationToken ct)
+        {
+            var memberId = await _mediator.Send(createMember,ct);
+            return Ok(memberId);
         }
     }
 }

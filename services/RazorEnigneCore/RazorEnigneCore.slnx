@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="RazorEngineCore.Test/RazorEngineCore.Test.csproj" />
+  <Project Path="RazorEnigneCore/RazorEnigneCore.csproj" />
+</Solution>

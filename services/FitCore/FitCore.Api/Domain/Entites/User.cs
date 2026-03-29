@@ -1,4 +1,5 @@
 ﻿using FitCore.Api.Domain.Entites.BaseEntites;
+using Microsoft.AspNetCore.Identity;
 
 namespace FitCore.Api.Domain.Entites
 {
@@ -9,15 +10,20 @@ namespace FitCore.Api.Domain.Entites
         Trainer = 3
     }
 
-    public class User : BaseEntityWithChangeTracking 
+    public class User : IdentityUser<Guid> , IBaseEntity<Guid>, IChangeTrackingEntity
     {
-        public required string Email { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public DateOnly DateOfBirth { get; set; }
-        public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
         public string? EmergencyContact { get; set; }
         public bool IsActive { get; set; }
+        public DateTime? LastLoginOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
+
+        // Navigation
+        public ICollection<Member> Members { get; set; }
+        public ICollection<Trainer> Trainers { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }
