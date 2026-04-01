@@ -1,4 +1,5 @@
 ﻿using System;
+using FitCore.Api.Domain;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -73,6 +74,13 @@ namespace FitCore.Api.Migrations
                 {
                     table.PrimaryKey("PK_Tenants", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Tenants",
+                columns: new[] { "Id", "Name", "Slug", "CreatedOn", "UpdatedOn" },
+                values: new object[] 
+                    { PrimordialTenantContants.Id, PrimordialTenantContants.Name, PrimordialTenantContants.Slug, DateTime.UtcNow, DateTime.UtcNow }
+                );
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -205,6 +213,41 @@ namespace FitCore.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FitnessGoals",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Label = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FitnessGoals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FitnessGoals_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "FitnessGoals",
+                columns: new[] { "Id", "CreatedOn", "UpdatedOn", "TenantId", "Label", "Description" },
+                values: new object[,]
+                {
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Build Muscle", "Build Muscle" },
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Lose Weight", "Lose Weight" },
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Improve Flexibility", "Improve Flexibility" },
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Improve Cardio", "Improve Cardio" },
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Train For Event", "Train For Event" },
+                    {Guid.CreateVersion7(),DateTime.UtcNow, DateTime.UtcNow, PrimordialTenantContants.Id, "Reduce Stress", "Reduce Stress" }
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Invitations",
                 columns: table => new
                 {
@@ -332,6 +375,17 @@ namespace FitCore.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_FitnessGoals_Label_TenantId",
+                table: "FitnessGoals",
+                columns: new[] { "Label", "TenantId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FitnessGoals_TenantId",
+                table: "FitnessGoals",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Invitations_InvitedByUserId",
                 table: "Invitations",
                 column: "InvitedByUserId");
@@ -390,6 +444,9 @@ namespace FitCore.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "FitnessGoals");
 
             migrationBuilder.DropTable(
                 name: "Invitations");

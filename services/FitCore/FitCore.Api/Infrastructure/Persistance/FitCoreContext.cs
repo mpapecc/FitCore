@@ -1,5 +1,6 @@
 ﻿using FitCore.Api.Domain.Entites;
 using FitCore.Api.Domain.Entites.BaseEntites;
+using FitCore.Api.Domain.Entites.Dictionaries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,9 @@ namespace FitCore.Api.Infrastructure.Persistance
         DbSet<Trainer> Trainers { get; set; }
         DbSet<RefreshToken> RefreshTokens { get; set; }
         DbSet<Invitation> Invitations { get; set; }
+        DbSet<FitnessGoal> FitnessGoals { get; set; }
+        DbSet<MemberFitnessGoal> MemberFitnessGoals { get; set; }
+        DbSet<ActivityLevel> ActivityLevels { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -60,6 +64,11 @@ namespace FitCore.Api.Infrastructure.Persistance
                       .WithMany()
                       .HasForeignKey(e => e.InvitedByUserId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<FitnessGoal>(entity =>
+            {
+                entity.HasIndex(e => new { e.Label, e.TenantId }).IsUnique();
             });
         }
     }

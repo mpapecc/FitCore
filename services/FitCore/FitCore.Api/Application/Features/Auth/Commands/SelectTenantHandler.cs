@@ -11,7 +11,10 @@ namespace FitCore.Api.Application.Features.Auth.Commands
 {
     public record SelectTenantCommand(string SelectorToken, Guid TenantId) : IRequest<SelectTenantResponse>;
 
-    public record SelectTenantResponse(string AccessToken, string RefreshToken, Guid UserId, Guid TenantId, string Role);
+    public record SelectTenantResponse(string AccessToken, string RefreshToken, Guid UserId, Guid TenantId, string Role, bool IsOnboardingCompleted);
+
+    // The subset returned to the client — RefreshToken is set as HttpOnly cookie by the controller
+    public record SelectTenantClientResponse(string AccessToken, Guid UserId, Guid TenantId, string Role, bool IsOnboardingCompleted);
 
     public class SelectTenantHandler : IRequestHandler<SelectTenantCommand, SelectTenantResponse>
     {
@@ -63,7 +66,7 @@ namespace FitCore.Api.Application.Features.Auth.Commands
                 ?? throw new Exception("Tenant not found");
 
             // Derive role from data
-            var role = await DeriveRoleAsync(userId, request.TenantId, ct);
+            var profileData = await DeriveRoleAsync(userId, request.TenantId, ct);
 
             // Generate refresh token
             var refreshTokenValue = jwtService.GenerateRefreshToken();
@@ -73,6 +76,7 @@ namespace FitCore.Api.Application.Features.Auth.Commands
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
+                TenantId = request.TenantId,
                 Token = refreshTokenValue,
                 CreatedOn = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddDays(jwtSettings.RefreshTokenExpiryDays),
@@ -82,43 +86,42 @@ namespace FitCore.Api.Application.Features.Auth.Commands
             await this.refreshTokenRepository.CommitAsync();
 
             // Generate scoped access token
-            var accessToken = jwtService.GenerateAccessToken(userId, request.TenantId, role);
+            var accessToken = jwtService.GenerateAccessToken(userId, request.TenantId, profileData.Role);
 
             return new SelectTenantResponse(
                 accessToken,
                 refreshTokenValue,
                 userId,
                 request.TenantId,
-                role);
+                profileData.Role,
+                profileData.IsOnboardingCompleted);
         }
 
-        private async Task<string> DeriveRoleAsync(
+        private async Task<(string Role, bool IsOnboardingCompleted)> DeriveRoleAsync(
             Guid userId,
             Guid tenantId,
             CancellationToken ct)
         {
             // Member check
-            var isMember = await this.memberRepository
+            var memberData = await this.memberRepository
                 .Query()
-                .AnyAsync(m => m.UserId == userId && m.TenantId == tenantId, ct);
-
-            if (isMember) return "Member";
-
-            // Trainer check
-            var ownerInfo = await this.trainerRepository
-                .Query()
-                .Where(t => t.UserId == userId && t.TenantId == tenantId)
-                .Select(x => new { x.IsAdmin })
+                .Where(m => m.UserId == userId && m.TenantId == tenantId)
+                .Select(x => new { x.IsOnboardingCompleted })
                 .FirstOrDefaultAsync();
 
-            if (ownerInfo == null)
+            if (memberData != null) return (Role :"Member" , memberData.IsOnboardingCompleted);
+
+            // Trainer check
+            var trainerData = await this.trainerRepository
+                .Query()
+                .Where(t => t.UserId == userId && t.TenantId == tenantId)
+                .Select(x => new { x.IsAdmin, x.IsOnboardingCompleted })
+                .FirstOrDefaultAsync();
+
+            if (trainerData == null)
                 throw new Exception("You do not have access to this gym");
 
-            if(ownerInfo.IsAdmin)
-                return "Admin";
-
-            return "Trainer";
-
+            return (Role: trainerData.IsAdmin ? "Admin": "Trainer", trainerData.IsOnboardingCompleted );
         }
     }
 }

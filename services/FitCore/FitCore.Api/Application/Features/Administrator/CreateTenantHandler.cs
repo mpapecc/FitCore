@@ -1,4 +1,5 @@
-﻿using FitCore.Api.Application.Interfaces;
+﻿using FitCore.Api.Application.Features.Trainers.Commnad;
+using FitCore.Api.Application.Interfaces;
 using FitCore.Api.Domain.Entites;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -6,21 +7,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitCore.Api.Application.Features.Administrator
 {
-    public record CreateTenantCommand(string Name, string ?Slug): IRequest<Unit>;
-    public class CreateTenantHandler : IRequestHandler<CreateTenantCommand, Unit>
+    public record CreateTenantCommand(
+        string Name, 
+        string ?Slug,
+        CreateUserCommand AdminUser
+        ) : IRequest<CreateTenantResponse>;
+
+    public record CreateTenantResponse(
+        Guid TenantId,
+        Guid AdmiUsernId,
+        string AdminEmail
+        );
+
+    public class CreateTenantHandler : IRequestHandler<CreateTenantCommand, CreateTenantResponse>
     {
+        private readonly IMediator mediator;
         private readonly IBaseRepository<Tenant> tenantRepository;
-        private readonly UserManager<User> userManager;
 
         public CreateTenantHandler(
-           IBaseRepository<Tenant> tenantRepository,
-           UserManager<User> userManager)
+            IMediator mediator,
+            IBaseRepository<Tenant> tenantRepository
+            )
         {
+            this.mediator = mediator;
             this.tenantRepository = tenantRepository;
-            this.userManager = userManager;
         }
 
-        public async Task<Unit> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
+        public async Task<CreateTenantResponse> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
         {
             var tenantExists = await this.tenantRepository.Query().AnyAsync(x => x.Name == request.Name || x.Slug == request.Slug);
             
@@ -31,7 +44,19 @@ namespace FitCore.Api.Application.Features.Administrator
             await this.tenantRepository.AddAsync(tenant);
             await this.tenantRepository.CommitAsync();
 
-            return Unit.Value;
+            var adminUserId = await this.mediator.Send(request.AdminUser, cancellationToken);
+
+            var createTrainerCommnad = new CreateTrainerCommand(
+                tenant.Id,
+                request.AdminUser.Email,
+                true,
+                "Admin user",
+                "Admin"
+            );
+
+            await this.mediator.Send(createTrainerCommnad, cancellationToken);
+
+            return new CreateTenantResponse(tenant.Id, adminUserId, request.AdminUser.Email);
         }
     }
 }

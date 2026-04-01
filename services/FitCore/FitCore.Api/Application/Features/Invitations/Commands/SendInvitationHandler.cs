@@ -65,11 +65,10 @@ namespace FitCore.Api.Application.Features.Invitations.Commands
                 throw new Exception(
                     "An active invitation already exists for this email");
 
-            // Check user is not already a member of this gym
             var user = await this.userManager.Users
-                .Where(u => u.Email == request.Email)
-                .Select(u => new { u.Id, u.FirstName, u.Members })
-                .FirstOrDefaultAsync();
+                    .Where(u => u.Email == request.Email)
+                    .Select(u => new { u.Id, u.FirstName, u.Members, u.Trainers })
+                    .FirstOrDefaultAsync();
 
             // Generate secure invitation token
             var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray())
@@ -86,35 +85,16 @@ namespace FitCore.Api.Application.Features.Invitations.Commands
                 Token = token,
                 Role = request.Role,
                 Status = InvitationStatus.Pending,
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
             };
 
-            if (user == null)
-            {
-                // Send invitation email for new user and member
-                await _emailService.SendInvitationAsync(
-                    request.Email,
-                    tenant.Name,
-                    $"{invitedBy.FirstName} {invitedBy.LastName}",
-                    token,
-                    ct);
-            }
-            else
-            {
-                var existingMember = user.Members.Any(m => m.TenantId == _currentUser.TenantId);
-
-                if (existingMember)
-                    throw new Exception(
-                        "This person is already a member of your gym");
-
-                // Send invitation email for new member with existing user
-                await _emailService.SendWelcomeEmailAsync(
-                    request.Email,
-                    user.FirstName,
-                    ct);
-            }
+            await _emailService.SendInvitationAsync(
+                        request.Email,
+                        tenant.Name,
+                        $"{invitedBy.FirstName} {invitedBy.LastName}",
+                        token,
+                        isAlreadyRegistered: user != null,
+                        ct);
 
             await this.invitationRepository.AddAsync(invitation);
             await this.invitationRepository.CommitAsync();

@@ -1,27 +1,22 @@
 import { CheckCircle, Loader2 } from "lucide-react";
+import type { GoalOption } from "./GoalsStep";
 
 interface AllSetStepProps {
   memberName: string;
   selectedGoals: string[];
+  goalOptions: GoalOption[];
   isLoading: boolean;
   onComplete: () => void;
 }
 
-const goalLabels: Record<string, string> = {
-  BuildMuscle: "Build Muscle",
-  LoseWeight: "Lose Weight",
-  ImproveFlexibility: "Improve Flexibility",
-  ImproveCardio: "Improve Cardio",
-  TrainForEvent: "Train for an Event",
-  ReduceStress: "Reduce Stress",
-};
-
 export default function AllSetStep({
   memberName,
   selectedGoals,
+  goalOptions,
   isLoading,
   onComplete,
 }: AllSetStepProps) {
+  const goalLabelMap = Object.fromEntries(goalOptions.map((g) => [g.id, g.label]));
   return (
     <div className="flex flex-col items-center text-center py-8 px-4">
       {/* Confetti dots */}
@@ -51,7 +46,7 @@ export default function AllSetStep({
                 key={goal}
                 className="bg-green/10 text-green border border-green/20 px-3 py-1 rounded-full text-sm font-medium"
               >
-                {goalLabels[goal] ?? goal}
+                {goalLabelMap[goal] ?? goal}
               </span>
             ))}
           </div>

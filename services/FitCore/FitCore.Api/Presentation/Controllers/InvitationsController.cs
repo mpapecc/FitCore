@@ -9,6 +9,7 @@ namespace FitCore.Api.Presentation.Controllers
 {
     [ApiController]
     [Route("api/invitations")]
+    [Authorize(Roles = "Admin")]
     public class InvitationsController : ControllerBase
     {
         private readonly IMediator _mediator;

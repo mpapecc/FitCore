@@ -2,7 +2,8 @@
 
 namespace FitCore.Api.Domain.Entites.Dictionaries
 {
-    public class FitnesssGoal: BaseDictionary
+    [Dictionary("FitnessGoals")]
+    public class FitnessGoal: BaseDictionary
     {
     }
 }

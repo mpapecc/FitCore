@@ -9,5 +9,6 @@ namespace FitCore.Api.Domain.Entites
         public string Bio { get; set; }
         public string Sepcialization { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsOnboardingCompleted { get; set; } = false;
     }
 }

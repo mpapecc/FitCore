@@ -1,4 +1,6 @@
-﻿namespace FitCore.Api.Application
+﻿using FitCore.Api.Domain;
+
+namespace FitCore.Api.Application
 {
     public static class ApplicationIoc
     {

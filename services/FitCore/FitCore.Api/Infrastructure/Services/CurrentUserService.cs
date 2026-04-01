@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Domain.Entites;
 
 namespace FitCore.Api.Infrastructure.Services
 {

@@ -3,6 +3,7 @@ using System;
 using FitCore.Api.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitCore.Api.Migrations
 {
     [DbContext(typeof(FitCoreContext))]
-    partial class FitCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260330165553_AddMemeberFitnessGoalTableAndRelation")]
+    partial class AddMemeberFitnessGoalTableAndRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,39 +24,6 @@ namespace FitCore.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("FitCore.Api.Domain.Entites.Dictionaries.ActivityLevel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("ActivityLevels");
-                });
 
             modelBuilder.Entity("FitCore.Api.Domain.Entites.Dictionaries.FitnessGoal", b =>
                 {
@@ -67,9 +37,6 @@ namespace FitCore.Api.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Label")
                         .IsRequired()
@@ -144,17 +111,8 @@ namespace FitCore.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ActivityLevelId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("CurrentHeight")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CurrentWeight")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsOnboardingCompleted")
                         .HasColumnType("boolean");
@@ -169,8 +127,6 @@ namespace FitCore.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ActivityLevelId");
 
                     b.HasIndex("TenantId");
 
@@ -228,9 +184,6 @@ namespace FitCore.Api.Migrations
 
                     b.Property<DateTime?>("RevokedOn")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -540,17 +493,6 @@ namespace FitCore.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FitCore.Api.Domain.Entites.Dictionaries.ActivityLevel", b =>
-                {
-                    b.HasOne("FitCore.Api.Domain.Entites.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("FitCore.Api.Domain.Entites.Dictionaries.FitnessGoal", b =>
                 {
                     b.HasOne("FitCore.Api.Domain.Entites.Tenant", "Tenant")
@@ -583,10 +525,6 @@ namespace FitCore.Api.Migrations
 
             modelBuilder.Entity("FitCore.Api.Domain.Entites.Member", b =>
                 {
-                    b.HasOne("FitCore.Api.Domain.Entites.Dictionaries.ActivityLevel", "ActivityLevel")
-                        .WithMany()
-                        .HasForeignKey("ActivityLevelId");
-
                     b.HasOne("FitCore.Api.Domain.Entites.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -598,8 +536,6 @@ namespace FitCore.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ActivityLevel");
 
                     b.Navigation("Tenant");
 

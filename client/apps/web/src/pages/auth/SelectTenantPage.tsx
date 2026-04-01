@@ -21,11 +21,9 @@ export default function SelectTenantPage() {
       {
         onSuccess: (data) => {
           tokenStorage.set(data.accessToken);
-          sessionStorage.setItem("refresh_token", data.refreshToken);
 
           session.setTokens(
             data.accessToken,
-            data.refreshToken,
             data.userId,
             data.tenantId,
             data.role,
@@ -34,7 +32,7 @@ export default function SelectTenantPage() {
           sessionStorage.removeItem("selector_token");
           sessionStorage.removeItem("tenants");
 
-          if (data.role === "Member") {
+          if (!data.isOnboardingComplete) {
             navigate("/onboarding", { replace: true });
           } else {
             navigate("/dashboard", { replace: true });
@@ -77,16 +75,21 @@ export default function SelectTenantPage() {
         <div className="bg-navy px-8 py-6">
           <div className="flex items-center gap-3">
             <Dumbbell className="w-6 h-6 text-green" />
-            <span className="text-xl font-black text-white tracking-tight">FitCore</span>
+            <span className="text-xl font-black text-white tracking-tight">
+              FitCore
+            </span>
           </div>
-          <p className="text-white/60 text-sm mt-1">Select your gym to continue</p>
+          <p className="text-white/60 text-sm mt-1">
+            Select your gym to continue
+          </p>
         </div>
 
         {/* Card body */}
         <div className="px-8 py-6">
           <h1 className="text-xl font-bold text-primary mb-1">Welcome back!</h1>
           <p className="text-secondary text-sm mb-6">
-            You are a member of multiple gyms. Which one would you like to access?
+            You are a member of multiple gyms. Which one would you like to
+            access?
           </p>
 
           <div className="flex flex-col gap-3">

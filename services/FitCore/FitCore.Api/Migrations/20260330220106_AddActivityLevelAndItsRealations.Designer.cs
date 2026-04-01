@@ -3,6 +3,7 @@ using System;
 using FitCore.Api.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitCore.Api.Migrations
 {
     [DbContext(typeof(FitCoreContext))]
-    partial class FitCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260330220106_AddActivityLevelAndItsRealations")]
+    partial class AddActivityLevelAndItsRealations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,17 +147,11 @@ namespace FitCore.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ActivityLevelId")
+                    b.Property<Guid>("ActivityLevelId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("CurrentHeight")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CurrentWeight")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsOnboardingCompleted")
                         .HasColumnType("boolean");
@@ -228,9 +225,6 @@ namespace FitCore.Api.Migrations
 
                     b.Property<DateTime?>("RevokedOn")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -585,7 +579,9 @@ namespace FitCore.Api.Migrations
                 {
                     b.HasOne("FitCore.Api.Domain.Entites.Dictionaries.ActivityLevel", "ActivityLevel")
                         .WithMany()
-                        .HasForeignKey("ActivityLevelId");
+                        .HasForeignKey("ActivityLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("FitCore.Api.Domain.Entites.Tenant", "Tenant")
                         .WithMany()

@@ -1,11 +1,13 @@
 ﻿using FitCore.Api.Application.Features.Trainers.Commnad;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitCore.Api.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class TrainerController : ControllerBase
     {
         private readonly IMediator mediator;

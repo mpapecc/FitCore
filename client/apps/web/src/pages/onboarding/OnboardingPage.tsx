@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   useCompleteOnboarding,
   useSkipOnboarding,
+  useFitnessGoals,
+  useActivityLevels,
   type OnboardingData,
-  type FitnessGoal,
   type ActivityLevel,
 } from "@fit-core/shared";
 import OnboardingProgress from "../../components/onboarding/OnboardingProgress";
@@ -22,6 +23,9 @@ const STEPS = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+
   const completeMutation = useCompleteOnboarding();
   const skipMutation = useSkipOnboarding();
   const [currentStep, setCurrentStep] = useState(1);
@@ -30,16 +34,39 @@ export default function OnboardingPage() {
   const [bodyData, setBodyData] = useState({
     currentWeightKg: "",
     heightCm: "",
-    dateOfBirth: "",
     activityLevel: "",
   });
 
   // TODO: get from session/auth context later
   const memberName = "Sarah";
 
+  const {
+    data: rawGoals,
+    isLoading: goalsLoading,
+    isError: goalsError,
+  } = useFitnessGoals();
+  const { data: activityLevels = [], isLoading: activityLevelsLoading } =
+    useActivityLevels();
+  const goalEmojiMap: Record<string, string> = {
+    "Build Muscle": "🏋️",
+    "Lose Weight": "🔥",
+    "Improve Flexibility": "🧘",
+    "Improve Cardio": "❤️",
+    "Train for an Event": "🏃",
+    "Reduce Stress": "😴",
+  };
+
+  const goalOptions = (rawGoals ?? []).map((item) => ({
+    id: item.id,
+    label: item.label,
+    icon: goalEmojiMap[item.label] ?? "🎯",
+  }));
+
   const handleToggleGoal = (goalId: string) => {
     setSelectedGoals((prev) =>
-      prev.includes(goalId) ? prev.filter((g) => g !== goalId) : [...prev, goalId],
+      prev.includes(goalId)
+        ? prev.filter((g) => g !== goalId)
+        : [...prev, goalId],
     );
   };
 
@@ -64,11 +91,13 @@ export default function OnboardingPage() {
 
   const handleComplete = () => {
     const data: OnboardingData = {
-      goals: selectedGoals as FitnessGoal[],
-      currentWeightKg: bodyData.currentWeightKg ? parseFloat(bodyData.currentWeightKg) : null,
+      fitnessGoals: selectedGoals,
+      currentWeightKg: bodyData.currentWeightKg
+        ? parseFloat(bodyData.currentWeightKg)
+        : null,
       heightCm: bodyData.heightCm ? parseFloat(bodyData.heightCm) : null,
-      dateOfBirth: bodyData.dateOfBirth || null,
       activityLevel: (bodyData.activityLevel || null) as ActivityLevel | null,
+      token: token,
     };
 
     completeMutation.mutate(data, {
@@ -96,6 +125,9 @@ export default function OnboardingPage() {
           )}
           {currentStep === 2 && (
             <GoalsStep
+              goals={goalOptions}
+              isLoading={goalsLoading}
+              isError={goalsError}
               selectedGoals={selectedGoals}
               onToggleGoal={handleToggleGoal}
               onBack={handleBack}
@@ -105,6 +137,8 @@ export default function OnboardingPage() {
           {currentStep === 3 && (
             <BodyStep
               data={bodyData}
+              activityLevels={activityLevels}
+              activityLevelsLoading={activityLevelsLoading}
               onChange={handleBodyChange}
               onBack={handleBack}
               onContinue={handleNext}
@@ -115,6 +149,7 @@ export default function OnboardingPage() {
             <AllSetStep
               memberName={memberName}
               selectedGoals={selectedGoals}
+              goalOptions={goalOptions}
               isLoading={completeMutation.isPending || skipMutation.isPending}
               onComplete={handleComplete}
             />

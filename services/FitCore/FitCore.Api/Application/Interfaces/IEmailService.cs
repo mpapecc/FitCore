@@ -1,11 +1,11 @@
-﻿namespace FitCore.Api.Application.Interfaces
+﻿using FitCore.Api.Domain.Entites;
+
+namespace FitCore.Api.Application.Interfaces
 {
     public interface IEmailService
     {
         Task SendEmailConfirmationAsync(
-            string email,
-            string name,
-            string token,
+            User user,
             CancellationToken ct = default);
 
         Task SendPasswordResetAsync(
@@ -24,6 +24,7 @@
             string gymName,
             string invitedByName,
             string token,
+            bool isAlreadyRegistered,
             CancellationToken ct = default);
     }
 }

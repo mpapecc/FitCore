@@ -41,153 +41,11 @@ namespace FitCore.Api.Infrastructure
             .AddEntityFrameworkStores<FitCoreContext>()
             .AddDefaultTokenProviders();
 
+            services.AddMemoryCache();
+
             services.AddDbContext<FitCoreContext>(options => 
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-            .UseSeeding((context, _) =>
-            {
-                if (context.Set<User>().Any())
-                    return;
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-                var soloTrainerUserId = Guid.CreateVersion7();
-                var gymOwnerTrainerUserId = Guid.CreateVersion7();
-                var multiTrainerUserId = Guid.CreateVersion7();
-                var memberOneUserId = Guid.CreateVersion7();
-                var user = new User
-                {
-                    Id = soloTrainerUserId,
-                    FirstName = "Solo",
-                    LastName = "Trainer",
-                    Email = "solo@trainer.com"
-                };
-                user.PasswordHash = new PasswordHasher<User>().HashPassword(user, "Password123!");
-                user.NormalizedEmail = user.Email.ToUpper();
-
-                var user1 = new User
-                {
-                    Id = gymOwnerTrainerUserId,
-                    FirstName = "Gym",
-                    LastName = "Owner",
-                    Email = "gym@owner-trainer.com"
-                };
-                user1.PasswordHash = new PasswordHasher<User>().HashPassword(user1, "Password123!");
-                user1.NormalizedEmail = user1.Email.ToUpper();
-
-                var user2 = new User
-                {
-                    Id = multiTrainerUserId,
-                    FirstName = "Multi",
-                    LastName = "Trainer",
-                    Email = "multi@trainer.com"
-                };
-                user2.PasswordHash = new PasswordHasher<User>().HashPassword(user2, "Password123!");
-                user2.NormalizedEmail = user2.Email.ToUpper();
-
-                var user3 = new User
-                {
-                    Id = memberOneUserId,
-                    FirstName = "Member",
-                    LastName = "1",
-                    Email = "member@one.com",
-                    PasswordHash = new PasswordHasher<User>().HashPassword(null!, "Password123!")
-                };
-                user3.PasswordHash = new PasswordHasher<User>().HashPassword(user3, "Password123!");
-                user3.NormalizedEmail = user3.Email.ToUpper();
-
-                context.Set<User>().AddRange(new List<User>()
-                {
-                    user,
-                    user1,
-                    user2,
-                    user3
-                });
-
-                var multiTrainerGymTenantId = Guid.CreateVersion7();
-                var soloTrainerGymTenantId = Guid.CreateVersion7();
-
-                context.Set<Tenant>().AddRange(new List<Tenant>()
-                {
-                    new Tenant
-                    {
-                        Id = multiTrainerGymTenantId,
-                        Name = "Multi trainer gym",
-                        Slug = "multi-trainer-gym",
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    },
-                    new Tenant
-                    {
-                        Id = soloTrainerGymTenantId,
-                        Name = "Solo trainer gym",
-                        Slug = "solo-trainer-gym",
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    }
-                });
-
-                var memberOneSoloTrainerMemeberId = Guid.CreateVersion7();
-                var memberOneMultiTrainerMemeberId = Guid.CreateVersion7();
-
-                context.Set<Member>().AddRange(new List<Member>()
-                {
-                    new Member
-                    {
-                        Id = memberOneSoloTrainerMemeberId,
-                        UserId = memberOneUserId,
-                        TenantId = soloTrainerGymTenantId,
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    },
-                    new Member
-                    {
-                        Id = memberOneMultiTrainerMemeberId,
-                        UserId = memberOneUserId,
-                        TenantId = multiTrainerGymTenantId,
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    }
-                });
-
-                var soloTrainerId = Guid.CreateVersion7();
-                var gymOwnerTrainerId = Guid.CreateVersion7();
-                var multiTrainerId = Guid.CreateVersion7();
-
-                context.Set<Trainer>().AddRange(new List<Trainer>()
-                {
-                    new Trainer
-                    {
-                        Id = soloTrainerId,
-                        UserId = soloTrainerUserId,
-                        TenantId = soloTrainerGymTenantId,
-                        Bio = "Solo trainer guy",
-                        Sepcialization = "Individuia",
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow,
-                        IsAdmin = true
-                    },
-                    new Trainer
-                    {
-                        Id = gymOwnerTrainerId,
-                        UserId = multiTrainerUserId,
-                        TenantId = multiTrainerGymTenantId,
-                        Bio = "Gym Owner Dude",
-                        Sepcialization = "Boss",
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow,
-                        IsAdmin = true
-                    },
-                    new Trainer
-                    {
-                        Id = multiTrainerId,
-                        UserId = multiTrainerUserId,
-                        TenantId = multiTrainerGymTenantId,
-                        Bio = "One of trainers",
-                        Sepcialization = "Traiing",
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    }
-                });
-                context.SaveChanges();
-            }));
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
@@ -197,7 +55,9 @@ namespace FitCore.Api.Infrastructure
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
             var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
+            // Keep JWT claim names as-is (sub, role, tenantId) — don't remap to long URIs
             //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -215,6 +75,8 @@ namespace FitCore.Api.Infrastructure
                     ValidAudience = jwtSettings.Audience,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
+                    //NameClaimType = "sub",   // maps HttpContext.User.Identity.Name
+                    //RoleClaimType = "role",  // makes [Authorize(Roles = "Admin")] work
                 };
             });
 
@@ -228,6 +90,7 @@ namespace FitCore.Api.Infrastructure
 
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<DictionaryService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IEmailService, EmailService>();
         }

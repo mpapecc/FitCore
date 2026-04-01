@@ -49,9 +49,7 @@ namespace FitCore.Api.Application.Features.Auth.Commands
                 LastName = request.LastName,
                 Email = request.Email,
                 UserName = request.Email,
-                IsActive = true,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow,
+                IsActive = true
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
@@ -61,59 +59,49 @@ namespace FitCore.Api.Application.Features.Auth.Commands
                 throw new Exception(errors);
             }
 
-            // Validate invitation token
-            var invitation = await this.invitationRepository
-                .Query()
-                .Include(i => i.Tenant)
-                .FirstOrDefaultAsync(i =>
-                    i.Token == request.InvitationToken &&
-                    i.Email == request.Email &&
-                    i.Status == InvitationStatus.Pending &&
-                    i.ExpiresAt > DateTime.UtcNow, ct)
-                ?? throw new Exception("Invalid or expired invitation");
-            
-            if(invitation.Role == InvitationRole.Member)
+            //Validate invitation token
+           var invitation = await this.invitationRepository
+               .Query()
+               .Include(i => i.Tenant)
+               .FirstOrDefaultAsync(i =>
+                   i.Token == request.InvitationToken &&
+                   i.Email == request.Email &&
+                   i.Status == InvitationStatus.Pending &&
+                   i.ExpiresAt > DateTime.UtcNow, ct)
+               ?? throw new Exception("Invalid or expired invitation");
+
+            if (invitation.Role == InvitationRole.Member)
             {
                 // Create MemberProfile for this tenant
                 var memberProfile = new Member
                 {
-                    Id = Guid.NewGuid(),
                     UserId = user.Id,
-                    TenantId = invitation.TenantId,
-                    CreatedOn = DateTime.UtcNow,
-                    UpdatedOn = DateTime.UtcNow,
+                    TenantId = invitation.TenantId
                 };
 
                 await this.memberRepository.AddAsync(memberProfile);
-            }else if(invitation.Role == InvitationRole.Trainer)
+            }
+            else if (invitation.Role == InvitationRole.Trainer)
             {
                 // Create MemberProfile for this tenant
                 var trainerProfile = new Trainer
                 {
-                    Id = Guid.NewGuid(),
                     UserId = user.Id,
                     Bio = string.Empty,
                     Sepcialization = string.Empty,
-                    TenantId = invitation.TenantId,
-                    CreatedOn = DateTime.UtcNow,
-                    UpdatedOn = DateTime.UtcNow,
+                    TenantId = invitation.TenantId
                 };
 
                 await this.trainerRepository.AddAsync(trainerProfile);
             }
 
-                // Mark invitation as accepted
+            // Mark invitation as accepted
             invitation.Status = InvitationStatus.Accepted;
             invitation.AcceptedAt = DateTime.UtcNow;
 
             await this.memberRepository.CommitAsync();
 
-            // Send email confirmation
-            var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmToken));
-
-            await _emailService.SendEmailConfirmationAsync(
-                user.Email!, user.FirstName, encodedToken, ct);
+            await _emailService.SendEmailConfirmationAsync(user, ct);
 
             return Unit.Value;
         }

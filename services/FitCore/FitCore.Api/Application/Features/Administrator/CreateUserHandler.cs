@@ -1,4 +1,5 @@
-﻿using FitCore.Api.Domain.Entites;
+﻿using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Domain.Entites;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,12 @@ namespace FitCore.Api.Application.Features.Administrator
     public class CreateUserHandler : IRequestHandler<CreateUserCommand, Guid>
     {
         private readonly UserManager<User> userManager;
+        private readonly IEmailService emailService;
 
-        public CreateUserHandler(UserManager<User> userManager)
+        public CreateUserHandler(UserManager<User> userManager, IEmailService emailService)
         {
             this.userManager = userManager;
+            this.emailService = emailService;
         }
 
         public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -49,6 +52,7 @@ namespace FitCore.Api.Application.Features.Administrator
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(x => x.Description)));
 
+            await this.emailService.SendEmailConfirmationAsync(user, cancellationToken);
             return user.Id;
         }
     }

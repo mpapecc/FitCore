@@ -1,13 +1,15 @@
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
+import type { DictionaryItem } from "@fit-core/shared";
 import OnboardingNav from "../OnboardingNav";
 
 interface BodyStepProps {
   data: {
     currentWeightKg: string;
     heightCm: string;
-    dateOfBirth: string;
     activityLevel: string;
   };
+  activityLevels: DictionaryItem[];
+  activityLevelsLoading: boolean;
   onChange: (field: string, value: string) => void;
   onBack: () => void;
   onContinue: () => void;
@@ -17,7 +19,15 @@ interface BodyStepProps {
 const inputClass =
   "border border-stroke rounded-lg px-3 py-3 text-primary w-full focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none placeholder:text-secondary bg-white";
 
-export default function BodyStep({ data, onChange, onBack, onContinue, onSkip }: BodyStepProps) {
+export default function BodyStep({
+  data,
+  activityLevels,
+  activityLevelsLoading,
+  onChange,
+  onBack,
+  onContinue,
+  onSkip,
+}: BodyStepProps) {
   return (
     <div className="py-6 px-4">
       <h2 className="text-2xl font-bold text-primary">Tell us about yourself</h2>
@@ -70,36 +80,30 @@ export default function BodyStep({ data, onChange, onBack, onContinue, onSkip }:
           </div>
         </div>
 
-        {/* Date of Birth */}
-        <div>
-          <label className="block text-sm font-medium text-primary mb-1.5">
-            Date of Birth
-          </label>
-          <input
-            type="date"
-            value={data.dateOfBirth}
-            onChange={(e) => onChange("dateOfBirth", e.target.value)}
-            className={inputClass}
-          />
-        </div>
-
         {/* Activity Level */}
         <div>
           <label className="block text-sm font-medium text-primary mb-1.5">
             Activity Level
           </label>
-          <select
-            value={data.activityLevel}
-            onChange={(e) => onChange("activityLevel", e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select your activity level</option>
-            <option value="Sedentary">Sedentary (little to no exercise)</option>
-            <option value="LightlyActive">Lightly Active (1-3 days/week)</option>
-            <option value="ModeratelyActive">Moderately Active (3-5 days/week)</option>
-            <option value="VeryActive">Very Active (6-7 days/week)</option>
-            <option value="ExtraActive">Extra Active (physical job + exercise)</option>
-          </select>
+          {activityLevelsLoading ? (
+            <div className="flex items-center gap-2 border border-stroke rounded-lg px-3 py-3">
+              <Loader2 className="w-4 h-4 text-green animate-spin" />
+              <span className="text-secondary text-sm">Loading...</span>
+            </div>
+          ) : (
+            <select
+              value={data.activityLevel}
+              onChange={(e) => onChange("activityLevel", e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Select your activity level</option>
+              {activityLevels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.label + ` (${level.description})`}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Info note */}
