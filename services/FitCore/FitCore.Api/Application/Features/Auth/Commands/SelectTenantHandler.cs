@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain.Entites;
 using FitCore.Api.Infrastructure.Settings;
 using MediatR;

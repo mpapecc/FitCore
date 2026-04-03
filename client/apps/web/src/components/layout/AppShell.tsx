@@ -1,22 +1,38 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { session } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 
-const ROUTE_TITLES: Record<string, string> = {
-  "/dashboard":      "Dashboard",
-  "/members":        "Members",
-  "/class-schedule": "Class Schedule",
-  "/workout-logs":   "Workout Logs",
-  "/nutrition-plans":"Nutrition Plans",
-  "/billing":        "Billing & Invoices",
-  "/settings":       "Settings",
-};
-
 export function AppShell() {
   const { pathname } = useLocation();
-  const title = ROUTE_TITLES[pathname]
-    ?? (pathname.startsWith("/members/") ? "Member Profile" : "FitCore");
+  const role = session.getRole();
+  const { t: tAdmin } = useTranslation("admin");
+
+  const ADMIN_ROUTE_TITLES: Record<string, string> = {
+    "/dashboard":       tAdmin("dashboard"),
+    "/members":         tAdmin("members"),
+    "/class-schedule":  tAdmin("schedule"),
+    "/workout-logs":    tAdmin("workouts"),
+    "/nutrition-plans": tAdmin("nutrition"),
+    "/billing":         tAdmin("billing"),
+    "/settings":        tAdmin("settings"),
+  };
+
+  const MEMBER_ROUTE_TITLES: Record<string, string> = {
+    "/member/dashboard": tAdmin("dashboard"),
+    "/member/book":      tAdmin("bookClass"),
+    "/member/bookings":  tAdmin("myBookings"),
+    "/member/progress":  tAdmin("myProgress"),
+    "/member/nutrition": tAdmin("nutritionPlan"),
+    "/member/invoices":  tAdmin("myInvoices"),
+    "/member/profile":   tAdmin("profileSettings"),
+  };
+
+  const routeTitles = role === "Member" ? MEMBER_ROUTE_TITLES : ADMIN_ROUTE_TITLES;
+  const title = routeTitles[pathname]
+    ?? (pathname.startsWith("/members/") ? tAdmin("memberProfile") : "FitCore");
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("sidebar-collapsed") === "true";

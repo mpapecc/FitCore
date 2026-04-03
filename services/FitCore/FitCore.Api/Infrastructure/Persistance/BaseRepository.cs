@@ -1,4 +1,4 @@
-﻿using FitCore.Api.Application.Interfaces;
+﻿using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain.Entites.BaseEntites;
 
 namespace FitCore.Api.Infrastructure.Persistance
@@ -12,19 +12,14 @@ namespace FitCore.Api.Infrastructure.Persistance
             this.context = context;
         }
 
-        public IQueryable<T> Query()
+        public virtual IQueryable<T> Query()
         {
             return context.Set<T>();
         }
 
-        public async Task AddAsync(T entity)
+        public virtual async Task AddAsync(T entity)
         {
             await context.Set<T>().AddAsync(entity);
-        }
-
-        public async Task<T?> GetByIdAsync(Guid id)
-        {
-            return await context.Set<T>().FindAsync(id);
         }
 
         public async Task CommitAsync()

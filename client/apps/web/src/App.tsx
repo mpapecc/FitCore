@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
 import { ProtectedAdminRoute } from "./components/auth/ProtectedAdminRoute";
+import { ProtectedMemberRoute } from "./components/auth/ProtectedMemberRoute";
 import { lazy, Suspense } from "react";
 
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
@@ -15,6 +16,7 @@ const ConfirmEmailPage = lazy(() => import("./pages/auth/ConfirmEmailPage"));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
 const SelectTenantPage = lazy(() => import("./pages/auth/SelectTenantPage"));
 const OnboardingPage = lazy(() => import("./pages/onboarding/OnboardingPage"));
+const TrainerOnboardingPage = lazy(() => import("./pages/onboarding/TrainerOnboardingPage"));
 const DashboardPage = lazy(() => import("./pages/admin/DashboardPage"));
 const MembersListPage = lazy(() => import("./pages/admin/MembersListPage"));
 const MemberProfilePage = lazy(() => import("./pages/admin/MemberProfilePage"));
@@ -25,6 +27,11 @@ const NutritionPlansPage = lazy(
 );
 const WorkoutLogsPage = lazy(() => import("./pages/admin/WorkoutLogsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
+const MemberDashboardPage = lazy(() => import("./pages/member/MemberDashboardPage"));
+const BookClassPage = lazy(() => import("./pages/member/BookClassPage"));
+const MyBookingsPage = lazy(() => import("./pages/member/MyBookingsPage"));
+const MyProgressPage   = lazy(() => import("./pages/member/MyProgressPage"));
+const MyNutritionPage  = lazy(() => import("./pages/member/MyNutritionPage"));
 
 function App() {
   return (
@@ -40,6 +47,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/select-gym" element={<SelectTenantPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/onboarding/trainer" element={<TrainerOnboardingPage />} />
 
           {/* Admin routes */}
           <Route element={<ProtectedAdminRoute />}>
@@ -52,6 +60,17 @@ function App() {
               <Route path="/nutrition-plans" element={<NutritionPlansPage />} />
               <Route path="/workout-logs" element={<WorkoutLogsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+            </Route>
+          </Route>
+
+          {/* Member routes */}
+          <Route element={<ProtectedMemberRoute />}>
+            <Route element={<AppShell />}>
+              <Route path="/member/dashboard" element={<MemberDashboardPage />} />
+              <Route path="/member/book"      element={<BookClassPage />} />
+              <Route path="/member/bookings" element={<MyBookingsPage />} />
+              <Route path="/member/progress"   element={<MyProgressPage />} />
+              <Route path="/member/nutrition"  element={<MyNutritionPage />} />
             </Route>
           </Route>
 

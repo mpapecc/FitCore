@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { GymClass, ClassDay } from "@fit-core/shared";
 import { days } from "@fit-core/shared";
 
@@ -37,6 +38,7 @@ type View = "Week" | "Day";
 const CLASS_TYPES = Object.keys(classTypeColors) as GymClass["type"][];
 
 export default function ClassSchedulePage() {
+  const { t } = useTranslation("admin");
   const [classes, setClasses] = useState<GymClass[]>(weekClasses);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<GymClass | null>(null);
@@ -183,7 +185,7 @@ export default function ClassSchedulePage() {
                     : "bg-white text-secondary hover:bg-ghost"
                 }`}
               >
-                {view}
+                {view === "Week" ? t("week") : t("day")}
               </button>
             ))}
           </div>
@@ -192,7 +194,7 @@ export default function ClassSchedulePage() {
             className="flex items-center gap-2 bg-green text-white font-semibold px-4 py-2 rounded-lg transition-all duration-DEFAULT active:scale-95 hover:bg-green-hover"
           >
             <Plus size={16} />
-            Add Class
+            {t("addClass")}
           </button>
         </div>
       </div>
@@ -214,7 +216,7 @@ export default function ClassSchedulePage() {
       <div className="flex-1 min-h-0 overflow-auto pt-4">
         {filteredClasses.length === 0 ? (
           <div className="bg-white border border-stroke rounded-lg shadow-sm flex items-center justify-center py-20">
-            <p className="text-secondary text-sm">No classes match your filters</p>
+            <p className="text-secondary text-sm">{t("noClassesMatchFilters")}</p>
           </div>
         ) : (
           <div className="bg-white border border-stroke rounded-lg shadow-sm overflow-hidden">

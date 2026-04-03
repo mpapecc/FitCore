@@ -13,5 +13,6 @@ export default defineConfig({
         "../../packages/shared/src/index.ts",
       ),
     },
+    dedupe: ["react", "react-dom", "i18next", "react-i18next"],
   },
 });

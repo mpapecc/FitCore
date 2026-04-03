@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MembersFilterBar } from "../../components/members/MembersFilterBar";
 import { MembersTable } from "../../components/members/MembersTable";
 import { AddMemberModal } from "../../components/members/AddMemberModal";
@@ -7,6 +8,7 @@ import type { Member } from "@fit-core/shared";
 import { useMembers } from "@fit-core/shared";
 
 export default function MembersListPage() {
+  const { t } = useTranslation("admin");
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [planFilter, setPlanFilter] = useState("");
@@ -18,8 +20,9 @@ export default function MembersListPage() {
 
   const { data: members, isLoading, error } = useMembers();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  const { t: tCommon } = useTranslation();
+  if (isLoading) return <div>{tCommon("loading")}</div>;
+  if (error) return <div>{tCommon("error")}</div>;
   let membersData: Member[] = members || [];
   // --- filtering ---
 
@@ -41,7 +44,7 @@ export default function MembersListPage() {
   }
 
   function handleDelete(id: number): void {
-    if (window.confirm("Are you sure you want to delete this member?")) {
+    if (window.confirm(t("deleteConfirmMember"))) {
       console.log("delete member:", id);
     }
   }

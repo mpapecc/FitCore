@@ -9,6 +9,7 @@ namespace FitCore.Api.Infrastructure.Persistance
 {
     public class FitCoreContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
+
         public FitCoreContext(DbContextOptions options) : base(options)
         {
         }
@@ -20,6 +21,7 @@ namespace FitCore.Api.Infrastructure.Persistance
         DbSet<Invitation> Invitations { get; set; }
         DbSet<FitnessGoal> FitnessGoals { get; set; }
         DbSet<MemberFitnessGoal> MemberFitnessGoals { get; set; }
+        DbSet<MembershipPlan> MembershipPlans { get; set; }
         DbSet<ActivityLevel> ActivityLevels { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

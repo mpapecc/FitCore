@@ -1,5 +1,6 @@
 ﻿
 using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain.Entites;
 using MediatR;
 using Microsoft.AspNetCore.Identity;

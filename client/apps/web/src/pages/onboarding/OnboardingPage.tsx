@@ -84,8 +84,8 @@ export default function OnboardingPage() {
 
   const handleSkip = () => {
     skipMutation.mutate(undefined, {
-      onSuccess: () => navigate("/dashboard", { replace: true }),
-      onError: () => navigate("/dashboard", { replace: true }),
+      onSuccess: () => navigate("/member/dashboard", { replace: true }),
+      onError:   () => navigate("/member/dashboard", { replace: true }),
     });
   };
 
@@ -101,8 +101,8 @@ export default function OnboardingPage() {
     };
 
     completeMutation.mutate(data, {
-      onSuccess: () => navigate("/dashboard", { replace: true }),
-      onError: () => navigate("/dashboard", { replace: true }),
+      onSuccess: () => navigate("/member/dashboard", { replace: true }),
+      onError:   () => navigate("/member/dashboard", { replace: true }),
     });
   };
 

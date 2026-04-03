@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain;
 using FitCore.Api.Domain.Entites.BaseEntites;
 using Microsoft.EntityFrameworkCore;

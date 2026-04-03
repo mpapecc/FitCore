@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { NutritionPlanList } from "../../components/nutrition/NutritionPlanList";
 import { NutritionPlanDetail } from "../../components/nutrition/NutritionPlanDetail";
 import { nutritionPlans } from "../../components/nutrition/nutritionData";
 
 export default function NutritionPlansPage() {
+  const { t } = useTranslation("admin");
   const [selectedPlanId, setSelectedPlanId] = useState<string>(
     nutritionPlans[0].id,
   );
@@ -17,14 +19,12 @@ export default function NutritionPlansPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Nutrition Plans</h1>
-          <p className="text-secondary text-sm mt-0.5">
-            Create and manage meal plans for your members
-          </p>
+          <h1 className="text-2xl font-bold text-primary">{t("nutrition")}</h1>
+          <p className="text-secondary text-sm mt-0.5">{t("nutritionPlansDesc")}</p>
         </div>
         <button className="flex items-center gap-2 bg-green text-white font-semibold px-4 py-2 rounded-lg transition-all duration-DEFAULT active:scale-95 hover:bg-green-hover">
           <Plus size={16} />
-          Create Plan
+          {t("createPlan")}
         </button>
       </div>
 

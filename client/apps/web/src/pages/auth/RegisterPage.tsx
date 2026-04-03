@@ -16,8 +16,10 @@ import {
   type RegisterFormData,
   useRegister,
 } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 
 function LeftPanel() {
+  const { t } = useTranslation("auth");
   return (
     <div className="relative hidden lg:flex flex-col h-full w-1/2 overflow-hidden">
       <img
@@ -34,9 +36,9 @@ function LeftPanel() {
         <div>
           <div className="text-green text-7xl font-black leading-none -mb-4">"</div>
           <p className="text-white text-xl font-light italic leading-relaxed">
-            Your fitness journey starts here.
+            {t("fitnessJourney")}
           </p>
-          <p className="text-white/40 text-sm mt-3">— Trusted by gym owners worldwide</p>
+          <p className="text-white/40 text-sm mt-3">{t("trustedBy")}</p>
         </div>
       </div>
     </div>
@@ -53,17 +55,19 @@ function getPasswordStrength(password: string): 0 | 1 | 2 | 3 | 4 {
   return 2;
 }
 
-const strengthConfig = [
-  null,
-  { label: "Very weak", bars: 1, color: "bg-error" },
-  { label: "Weak", bars: 2, color: "bg-warning" },
-  { label: "Good", bars: 3, color: "bg-warning" },
-  { label: "Strong", bars: 4, color: "bg-success" },
-] as const;
-
 function PasswordStrengthIndicator({ password }: { password: string }) {
+  const { t } = useTranslation("auth");
   const level = getPasswordStrength(password);
   if (!password) return null;
+
+  const strengthConfig = [
+    null,
+    { key: "passwordStrengthVeryWeak", bars: 1, color: "bg-error" },
+    { key: "passwordStrengthWeak", bars: 2, color: "bg-warning" },
+    { key: "passwordStrengthGood", bars: 3, color: "bg-warning" },
+    { key: "passwordStrengthStrong", bars: 4, color: "bg-success" },
+  ] as const;
+
   const config = strengthConfig[level]!;
   return (
     <div className="mt-2">
@@ -78,13 +82,14 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
         ))}
       </div>
       <p className={`text-xs mt-1 ${level === 4 ? "text-success" : level >= 2 ? "text-warning" : "text-error"}`}>
-        {config.label}
+        {t(config.key)}
       </p>
     </div>
   );
 }
 
 function InvalidInvitation() {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center w-full lg:w-1/2 bg-white px-8 py-12">
@@ -92,16 +97,14 @@ function InvalidInvitation() {
         <div className="w-14 h-14 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
           <AlertCircle className="w-7 h-7 text-error" />
         </div>
-        <h1 className="text-2xl font-black text-primary tracking-tight">Invalid invitation link</h1>
-        <p className="text-secondary text-sm mt-2 mb-6">
-          This invitation link is missing or invalid. Please ask your gym admin to resend the invitation.
-        </p>
+        <h1 className="text-2xl font-black text-primary tracking-tight">{t("invalidInvitation")}</h1>
+        <p className="text-secondary text-sm mt-2 mb-6">{t("invalidInvitationDesc")}</p>
         <button
           type="button"
           onClick={() => navigate("/login")}
           className="text-sm text-green hover:underline cursor-pointer"
         >
-          Back to login
+          {t("backToLogin")}
         </button>
       </div>
     </div>
@@ -109,6 +112,7 @@ function InvalidInvitation() {
 }
 
 function RightPanel({ token, email }: { token: string; email: string }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const registerMutation = useRegister();
   const [showPassword, setShowPassword] = useState(false);
@@ -145,16 +149,14 @@ function RightPanel({ token, email }: { token: string; email: string }) {
   return (
     <div className="flex flex-col items-center justify-center w-full lg:w-1/2 bg-white px-8 py-12 overflow-y-auto">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-black text-primary tracking-tight">Complete your registration</h1>
-        <p className="text-secondary text-sm mt-2 mb-8">
-          You were invited to join FitCore. Set up your account below.
-        </p>
+        <h1 className="text-3xl font-black text-primary tracking-tight">{t("completeRegistration")}</h1>
+        <p className="text-secondary text-sm mt-2 mb-8">{t("invitedToJoin")}</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           {/* First Name */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              First name
+              {t("firstName")}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
@@ -177,7 +179,7 @@ function RightPanel({ token, email }: { token: string; email: string }) {
           {/* Last Name */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Last name
+              {t("lastName")}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
@@ -200,7 +202,7 @@ function RightPanel({ token, email }: { token: string; email: string }) {
           {/* Email — pre-filled, disabled */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Email address
+              {t("emailAddress")}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
@@ -217,14 +219,14 @@ function RightPanel({ token, email }: { token: string; email: string }) {
           {/* Password */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Password
+              {t("password")}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
               <input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 aria-invalid={!!errors.password}
                 className="w-full pl-10 pr-12 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error"
               />
@@ -248,14 +250,14 @@ function RightPanel({ token, email }: { token: string; email: string }) {
           {/* Confirm Password */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Confirm password
+              {t("confirmPassword")}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
               <input
                 {...register("confirmPassword")}
                 type={showConfirm ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 aria-invalid={!!errors.confirmPassword}
                 className="w-full pl-10 pr-12 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error"
               />
@@ -284,10 +286,10 @@ function RightPanel({ token, email }: { token: string; email: string }) {
             {registerMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Creating account...
+                {t("creatingAccount")}
               </span>
             ) : (
-              "Create Account"
+              t("createAccount")
             )}
           </button>
 
@@ -295,19 +297,19 @@ function RightPanel({ token, email }: { token: string; email: string }) {
           {registerMutation.isError && (
             <div className="bg-error/10 border border-error/20 text-error text-sm rounded-lg px-4 py-3 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Something went wrong. Please try again or contact your gym admin.
+              {t("registerError")}
             </div>
           )}
         </form>
 
         <p className="mt-6 text-center text-sm text-secondary">
-          Already have an account?{" "}
+          {t("alreadyHaveAccount")}{" "}
           <button
             type="button"
             onClick={() => navigate("/login")}
             className="text-green hover:underline cursor-pointer"
           >
-            Sign in
+            {t("signIn")}
           </button>
         </p>
       </div>

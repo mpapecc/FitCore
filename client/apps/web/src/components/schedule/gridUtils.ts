@@ -1,5 +1,3 @@
-import type { GymClass } from "@fit-core/shared";
-
 export const HOUR_HEIGHT = 64; // px per hour
 export const START_HOUR   = 6; // grid starts at 06:00
 export const GRID_HOURS   = 16; // 06:00 → 22:00
@@ -19,8 +17,8 @@ export function getClassPosition(
 
 // ─── Overlap layout ───────────────────────────────────────────────────────────
 
-export interface PositionedClass {
-  gymClass: GymClass;
+export interface PositionedClass<T> {
+  gymClass: T;
   column: number;       // 0-indexed lane within its overlap cluster
   totalColumns: number; // number of lanes in the cluster
 }
@@ -30,7 +28,7 @@ function parseMinutes(time: string): number {
   return h * 60 + m;
 }
 
-function doOverlap(a: GymClass, b: GymClass): boolean {
+function doOverlap<T extends { startTime: string; duration: number }>(a: T, b: T): boolean {
   const aStart = parseMinutes(a.startTime);
   const bStart = parseMinutes(b.startTime);
   return aStart < bStart + b.duration && aStart + a.duration > bStart;
@@ -43,7 +41,7 @@ function doOverlap(a: GymClass, b: GymClass): boolean {
  * Uses union-find to group transitively overlapping classes into clusters,
  * then greedily assigns each class to the lowest available lane.
  */
-export function positionClasses(classes: GymClass[]): PositionedClass[] {
+export function positionClasses<T extends { startTime: string; duration: number }>(classes: T[]): PositionedClass<T>[] {
   if (classes.length === 0) return [];
 
   const n = classes.length;
@@ -69,7 +67,7 @@ export function positionClasses(classes: GymClass[]): PositionedClass[] {
     clusters.set(root, g);
   }
 
-  const result: PositionedClass[] = new Array(n);
+  const result: PositionedClass<T>[] = new Array(n);
 
   for (const indices of clusters.values()) {
     // Sort within cluster by start time

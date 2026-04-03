@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SettingsNav } from "../../components/settings/SettingsNav";
 import type { SettingsTab } from "../../components/settings/SettingsNav";
 import { GeneralSettingsPanel } from "../../components/settings/panels/GeneralSettingsPanel";
@@ -8,6 +9,7 @@ import AppearancePanel from "../../components/settings/panels/AppearancePanel";
 import AccountPanel from "../../components/settings/panels/AccountPanel";
 
 export default function SettingsPage() {
+  const { t } = useTranslation("admin");
   const [activeTab, setActiveTab] = useState<SettingsTab>("General");
 
   return (
@@ -15,10 +17,8 @@ export default function SettingsPage() {
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Settings</h1>
-          <p className="text-secondary text-sm mt-0.5">
-            Manage your gym configuration and preferences
-          </p>
+          <h1 className="text-2xl font-bold text-primary">{t("settings")}</h1>
+          <p className="text-secondary text-sm mt-0.5">{t("settingsDesc")}</p>
         </div>
       </div>
 

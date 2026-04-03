@@ -1,4 +1,8 @@
-﻿using FitCore.Api.Presentation.Features;
+﻿using System.ComponentModel;
+using System.Xml.Linq;
+using FitCore.Api.Presentation.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace FitCore.Api.Presentation
 {
@@ -6,10 +10,10 @@ namespace FitCore.Api.Presentation
     { 
         public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
-            services.AddControllers(o => 
+            services.AddControllers(o =>
                 o.Conventions
                     .Add(new GenericControllerRouteConvention()))
-                    .ConfigureApplicationPartManager(m => 
+                    .ConfigureApplicationPartManager(m =>
                         m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()
                 ));
 

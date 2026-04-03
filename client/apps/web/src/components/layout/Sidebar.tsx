@@ -4,14 +4,21 @@ import {
   LayoutDashboard,
   Users,
   CalendarDays,
+  CalendarPlus,
+  CalendarCheck,
+  TrendingUp,
+  Salad,
   Dumbbell,
   Apple,
   Receipt,
   Settings,
+  UserCircle,
   ChevronLeft,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
+import { session } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -24,24 +31,38 @@ interface NavItem {
   path: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Members", icon: Users, path: "/members" },
-  { label: "Class Schedule", icon: CalendarDays, path: "/class-schedule" },
-  { label: "Workout Logs", icon: Dumbbell, path: "/workout-logs" },
-  { label: "Nutrition Plans", icon: Apple, path: "/nutrition-plans" },
-  { label: "Billing & Invoices", icon: Receipt, path: "/billing" },
-  { label: "Settings", icon: Settings, path: "/settings" },
-];
-
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const { pathname } = useLocation();
-  const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(
-    null,
-  );
+  const { t: tAdmin } = useTranslation("admin");
+  const { t: tMember } = useTranslation("admin");
+  const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(null);
+
+  const role = session.getRole();
+
+  const ADMIN_NAV_ITEMS: NavItem[] = [
+    { label: tAdmin("dashboard"),  icon: LayoutDashboard, path: "/dashboard"      },
+    { label: tAdmin("members"),    icon: Users,           path: "/members"        },
+    { label: tAdmin("schedule"),   icon: CalendarDays,    path: "/class-schedule" },
+    { label: tAdmin("workouts"),   icon: Dumbbell,        path: "/workout-logs"   },
+    { label: tAdmin("nutrition"),  icon: Apple,           path: "/nutrition-plans"},
+    { label: tAdmin("billing"),    icon: Receipt,         path: "/billing"        },
+    { label: tAdmin("settings"),   icon: Settings,        path: "/settings"       },
+  ];
+
+  const MEMBER_NAV_ITEMS: NavItem[] = [
+    { label: tMember("dashboard"),        icon: LayoutDashboard, path: "/member/dashboard" },
+    { label: tMember("bookClass"),        icon: CalendarPlus,    path: "/member/book"      },
+    { label: tMember("myBookings"),       icon: CalendarCheck,   path: "/member/bookings"  },
+    { label: tMember("myProgress"),       icon: TrendingUp,      path: "/member/progress"  },
+    { label: tMember("nutritionPlan"),    icon: Salad,           path: "/member/nutrition" },
+    { label: tMember("myInvoices"),       icon: Receipt,         path: "/member/invoices"  },
+    { label: tMember("profileSettings"), icon: UserCircle,      path: "/member/profile"   },
+  ];
+
+  const navItems = role === "Member" ? MEMBER_NAV_ITEMS : ADMIN_NAV_ITEMS;
 
   function isActive(path: string): boolean {
-    return pathname.startsWith(path);
+    return pathname === path;
   }
 
   return (
@@ -62,7 +83,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="sidebar-nav flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, icon: Icon, path }) => {
+        {navItems.map(({ label, icon: Icon, path }) => {
           const active = isActive(path);
           return (
             <div
@@ -102,7 +123,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Fixed tooltip — renders outside all overflow contexts */}
+      {/* Fixed tooltip */}
       {isCollapsed && tooltip && (
         <div
           className="fixed left-16 ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap pointer-events-none z-50 -translate-y-1/2"

@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using FitCore.Api.Application.Interfaces;
+using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain.Entites;
 using FitCore.Api.Infrastructure.Identity;
 using FitCore.Api.Infrastructure.Persistance;
@@ -47,6 +48,7 @@ namespace FitCore.Api.Infrastructure
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped(typeof(ITenantRepository<>), typeof(TenantRepository<>));
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));

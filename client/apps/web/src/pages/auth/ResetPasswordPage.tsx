@@ -17,6 +17,7 @@ import {
   type ResetPasswordFormData,
   useResetPassword,
 } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 
 function getPasswordStrength(password: string): 0 | 1 | 2 | 3 | 4 {
   if (!password) return 0;
@@ -28,18 +29,20 @@ function getPasswordStrength(password: string): 0 | 1 | 2 | 3 | 4 {
   return 2;
 }
 
-const strengthConfig = [
-  null,
-  { label: "Very weak", bars: 1, color: "bg-error" },
-  { label: "Weak", bars: 2, color: "bg-warning" },
-  { label: "Good", bars: 3, color: "bg-warning" },
-  { label: "Strong", bars: 4, color: "bg-success" },
-] as const;
-
 function PasswordStrengthIndicator({ password }: { password: string }) {
+  const { t } = useTranslation("auth");
   const level = getPasswordStrength(password);
   if (!password) return null;
-  const config = strengthConfig[level];
+
+  const strengthConfig = [
+    null,
+    { key: "passwordStrengthVeryWeak", bars: 1, color: "bg-error" },
+    { key: "passwordStrengthWeak", bars: 2, color: "bg-warning" },
+    { key: "passwordStrengthGood", bars: 3, color: "bg-warning" },
+    { key: "passwordStrengthStrong", bars: 4, color: "bg-success" },
+  ] as const;
+
+  const config = strengthConfig[level]!;
   return (
     <div className="mt-2">
       <div className="flex gap-1">
@@ -57,13 +60,14 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           level === 4 ? "text-success" : level >= 2 ? "text-warning" : "text-error"
         }`}
       >
-        {config.label}
+        {t(config.key)}
       </p>
     </div>
   );
 }
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -103,16 +107,14 @@ export default function ResetPasswordPage() {
             <div className="bg-error/10 rounded-full p-4 mb-4">
               <XCircle className="w-10 h-10 text-error" />
             </div>
-            <h1 className="text-2xl font-bold text-primary">Invalid reset link</h1>
-            <p className="text-secondary text-sm mt-2 mb-6">
-              This link may be expired or invalid.
-            </p>
+            <h1 className="text-2xl font-bold text-primary">{t("invalidResetLink")}</h1>
+            <p className="text-secondary text-sm mt-2 mb-6">{t("invalidResetLinkDesc")}</p>
             <button
               type="button"
               onClick={() => navigate("/login")}
               className="w-full border border-stroke text-primary hover:bg-ghost py-3 rounded-lg transition-all duration-DEFAULT font-medium"
             >
-              Back to Login
+              {t("backToLoginButton")}
             </button>
           </div>
         )}
@@ -123,16 +125,14 @@ export default function ResetPasswordPage() {
             <div className="bg-green/10 rounded-full p-4 mb-4">
               <CheckCircle className="w-10 h-10 text-green" />
             </div>
-            <h1 className="text-2xl font-bold text-primary">Password updated!</h1>
-            <p className="text-secondary text-sm mt-2 mb-8">
-              Your password has been reset successfully. You can now sign in with your new password.
-            </p>
+            <h1 className="text-2xl font-bold text-primary">{t("passwordUpdated")}</h1>
+            <p className="text-secondary text-sm mt-2 mb-8">{t("passwordUpdatedDesc")}</p>
             <button
               type="button"
               onClick={() => navigate("/login")}
               className="w-full bg-green hover:bg-green-hover text-white font-semibold py-3 rounded-lg transition-all duration-DEFAULT active:scale-95 text-base"
             >
-              Sign In Now →
+              {t("signInNow")}
             </button>
           </div>
         )}
@@ -146,26 +146,24 @@ export default function ResetPasswordPage() {
               className="flex items-center gap-1 text-secondary hover:text-primary text-sm mb-6 transition-all duration-DEFAULT cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to login
+              {t("backToLogin")}
             </button>
 
-            <h1 className="text-2xl font-bold text-primary">Set new password</h1>
-            <p className="text-secondary text-sm mt-2 mb-6">
-              Choose a strong password for your FitCore account.
-            </p>
+            <h1 className="text-2xl font-bold text-primary">{t("setNewPassword")}</h1>
+            <p className="text-secondary text-sm mt-2 mb-6">{t("setNewPasswordDesc")}</p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-primary mb-1.5">
-                  New password
+                  {t("newPassword")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
                   <input
                     {...register("password")}
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t("passwordPlaceholder")}
                     aria-invalid={!!errors.password}
                     className="w-full pl-10 pr-12 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error"
                   />
@@ -189,14 +187,14 @@ export default function ResetPasswordPage() {
               {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-primary mb-1.5">
-                  Confirm new password
+                  {t("confirmNewPassword")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
                   <input
                     {...register("confirmPassword")}
                     type={showConfirm ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t("passwordPlaceholder")}
                     aria-invalid={!!errors.confirmPassword}
                     className="w-full pl-10 pr-12 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error"
                   />
@@ -225,10 +223,10 @@ export default function ResetPasswordPage() {
                 {resetMutation.isPending ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Resetting...
+                    {t("resetting")}
                   </span>
                 ) : (
-                  "Reset Password"
+                  t("resetPassword")
                 )}
               </button>
 
@@ -236,7 +234,7 @@ export default function ResetPasswordPage() {
               {resetMutation.isError && (
                 <div className="bg-error/10 border border-error/20 text-error text-sm rounded-lg px-4 py-3 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  Something went wrong. Please try again or request a new reset link.
+                  {t("resetPasswordError")}
                 </div>
               )}
             </form>

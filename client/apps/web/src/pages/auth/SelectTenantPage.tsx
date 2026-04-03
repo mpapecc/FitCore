@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, ChevronRight, Dumbbell, Loader2 } from "lucide-react";
 import { useSelectTenant, session, type TenantInfo } from "@fit-core/shared";
 import { tokenStorage } from "../../utils/token";
+import { useTranslation } from "react-i18next";
 
 export default function SelectTenantPage() {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const selectMutation = useSelectTenant();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -32,8 +34,10 @@ export default function SelectTenantPage() {
           sessionStorage.removeItem("selector_token");
           sessionStorage.removeItem("tenants");
 
-          if (!data.isOnboardingComplete) {
+          if (!data.isOnboardingComplete && data.role === "Member") {
             navigate("/onboarding", { replace: true });
+          } else if (!data.isOnboardingComplete && data.role === "Trainer") {
+            navigate("/onboarding/trainer", { replace: true });
           } else {
             navigate("/dashboard", { replace: true });
           }
@@ -62,7 +66,7 @@ export default function SelectTenantPage() {
       <div className="flex items-center justify-center min-h-screen bg-ghost">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 text-green animate-spin" />
-          <p className="text-secondary text-sm">Signing you in...</p>
+          <p className="text-secondary text-sm">{t("signingYouIn")}</p>
         </div>
       </div>
     );
@@ -80,17 +84,14 @@ export default function SelectTenantPage() {
             </span>
           </div>
           <p className="text-white/60 text-sm mt-1">
-            Select your gym to continue
+            {t("selectGymToContinue")}
           </p>
         </div>
 
         {/* Card body */}
         <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-primary mb-1">Welcome back!</h1>
-          <p className="text-secondary text-sm mb-6">
-            You are a member of multiple gyms. Which one would you like to
-            access?
-          </p>
+          <h1 className="text-xl font-bold text-primary mb-1">{t("welcomeBackTitle")}</h1>
+          <p className="text-secondary text-sm mb-6">{t("multipleGyms")}</p>
 
           <div className="flex flex-col gap-3">
             {tenants.map((tenant) => (
@@ -124,14 +125,14 @@ export default function SelectTenantPage() {
           {selectMutation.isError && (
             <div className="bg-error/10 border border-error/20 text-error text-sm rounded-lg px-4 py-3 flex items-center gap-2 mt-4">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Something went wrong. Please try again.
+              {t("somethingWentWrong")}
             </div>
           )}
         </div>
 
         {/* Card footer */}
         <div className="px-8 py-4 border-t border-stroke flex items-center gap-1">
-          <span className="text-secondary text-sm">Not your account?</span>
+          <span className="text-secondary text-sm">{t("notYourAccount")}</span>
           <button
             type="button"
             onClick={() => {
@@ -141,7 +142,7 @@ export default function SelectTenantPage() {
             }}
             className="text-green text-sm hover:underline cursor-pointer"
           >
-            Sign in with a different account
+            {t("signInWithDifferent")}
           </button>
         </div>
       </div>

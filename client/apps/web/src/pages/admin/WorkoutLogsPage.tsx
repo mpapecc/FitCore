@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { WorkoutLog } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 import WorkoutSummaryCards from "../../components/workouts/WorkoutSummaryCards";
 import { WorkoutFilterBar } from "../../components/workouts/WorkoutFilterBar";
 import { WorkoutLogsTable } from "../../components/workouts/WorkoutLogsTable";
@@ -7,6 +8,7 @@ import { WorkoutDetailDrawer } from "../../components/workouts/WorkoutDetailDraw
 import { workoutLogs } from "../../components/workouts/workoutData";
 
 export default function WorkoutLogsPage() {
+  const { t } = useTranslation("admin");
   const [search, setSearch] = useState("");
   const [trainerFilter, setTrainerFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -48,14 +50,12 @@ export default function WorkoutLogsPage() {
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Workout Logs</h1>
-          <p className="text-secondary text-sm mt-0.5">
-            Track and review member workout sessions
-          </p>
+          <h1 className="text-2xl font-bold text-primary">{t("workouts")}</h1>
+          <p className="text-secondary text-sm mt-0.5">{t("workoutLogsDesc")}</p>
         </div>
         <div className="bg-ghost px-3 py-1.5 rounded-lg border border-stroke">
           <span className="text-secondary text-sm">
-            {workoutLogs.length} sessions logged
+            {workoutLogs.length} {t("sessionsLogged")}
           </span>
         </div>
       </div>

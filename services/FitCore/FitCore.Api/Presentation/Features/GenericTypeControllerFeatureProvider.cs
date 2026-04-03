@@ -31,7 +31,6 @@ namespace FitCore.Api.Presentation.Features
             foreach (var candidate in candidates)
             {
                 var controller = typeof(DictionaryController<>).MakeGenericType(candidate);
-                //controller.Name = $"{candidate.Name}Controller";
 
                 feature.Controllers.Add(
                     controller.GetTypeInfo()

@@ -12,8 +12,10 @@ import {
   Mail,
 } from "lucide-react";
 import { loginSchema, type LoginFormData, useLogin } from "@fit-core/shared";
+import { useTranslation } from "react-i18next";
 
 function LeftPanel() {
+  const { t } = useTranslation("auth");
   return (
     <div className="relative hidden lg:flex flex-col h-full w-1/2 overflow-hidden">
       <img
@@ -34,11 +36,9 @@ function LeftPanel() {
             "
           </div>
           <p className="text-white text-xl font-light italic leading-relaxed">
-            Your fitness journey starts here.
+            {t("fitnessJourney")}
           </p>
-          <p className="text-white/40 text-sm mt-3">
-            — Trusted by gym owners worldwide
-          </p>
+          <p className="text-white/40 text-sm mt-3">{t("trustedBy")}</p>
         </div>
       </div>
     </div>
@@ -46,6 +46,7 @@ function LeftPanel() {
 }
 
 function RightPanel() {
+  const { t } = useTranslation("auth");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const loginMutation = useLogin();
@@ -72,24 +73,24 @@ function RightPanel() {
     <div className="flex flex-col items-center justify-center w-full lg:w-1/2 bg-white px-8 py-12 overflow-y-auto">
       <div className="w-full max-w-sm">
         <h1 className="text-3xl font-black text-primary tracking-tight">
-          Welcome back
+          {t("welcomeBack")}
         </h1>
         <p className="text-secondary text-sm mt-2 mb-8">
-          Sign in to your FitCore account
+          {t("signInSubtitle")}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           {/* Email field */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Email address
+              {t("emailAddress")}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
               <input
                 {...register("email")}
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("emailPlaceholder")}
                 aria-invalid={!!errors.email}
                 className="w-full pl-10 pr-4 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error aria-invalid:ring-error/20"
               />
@@ -105,14 +106,14 @@ function RightPanel() {
           {/* Password field */}
           <div>
             <label className="block text-sm font-medium text-primary mb-1.5">
-              Password
+              {t("password")}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary w-4 h-4 pointer-events-none" />
               <input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 aria-invalid={!!errors.password}
                 className="w-full pl-10 pr-12 py-3 border border-stroke rounded-lg text-primary placeholder:text-secondary bg-white focus:ring-2 focus:ring-green focus:border-transparent transition-all duration-DEFAULT outline-none aria-invalid:border-error"
               />
@@ -143,7 +144,7 @@ function RightPanel() {
               onClick={() => navigate("/forgot-password")}
               className="text-sm text-green hover:underline cursor-pointer"
             >
-              Forgot password?
+              {t("forgotPassword")}
             </button>
           </div>
 
@@ -156,10 +157,10 @@ function RightPanel() {
             {loginMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Signing in...
+                {t("signingIn")}
               </span>
             ) : (
-              "Sign In"
+              t("signInButton")
             )}
           </button>
 
@@ -167,14 +168,14 @@ function RightPanel() {
           {loginMutation.isError && (
             <div className="bg-error/10 border border-error/20 text-error text-sm rounded-lg px-4 py-3 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Invalid email or password. Please try again.
+              {t("loginError")}
             </div>
           )}
 
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-stroke" />
-            <span className="text-secondary text-sm">or</span>
+            <span className="text-secondary text-sm">{t("or")}</span>
             <div className="flex-1 h-px bg-stroke" />
           </div>
 
@@ -206,12 +207,12 @@ function RightPanel() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
+            {t("continueWithGoogle")}
           </button>
         </form>
 
         <p className="mt-8 text-center text-sm text-secondary">
-          Having trouble? Contact your gym admin.
+          {t("troubleContact")}
         </p>
       </div>
     </div>

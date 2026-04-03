@@ -1,4 +1,4 @@
-﻿using FitCore.Api.Application.Interfaces;
+﻿using FitCore.Api.Application.Interfaces.Repositories;
 using FitCore.Api.Domain.Entites;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +24,9 @@ namespace FitCore.Api.Application.Features.Members.Queries
 
     public class GetMembersHandler : IRequestHandler<GetMembersQuery, List<MemberResponse>>
     {
-        private readonly IBaseRepository<Member> memberRepository;
+        private readonly ITenantRepository<Member> memberRepository;
 
-        public GetMembersHandler(IBaseRepository<Member> memberRepository)
+        public GetMembersHandler(ITenantRepository<Member> memberRepository)
         {
             this.memberRepository = memberRepository;
         }
